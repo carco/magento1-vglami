@@ -1,0 +1,4 @@
+./app/code/community/Vasilica/Glami
+./app/design/frontend/base/default/layout/vasilica_glami.xml
+./app/design/frontend/base/default/template/vasilica/glami.phtml
+./app/etc/modules/Vasilica_Glami.xml

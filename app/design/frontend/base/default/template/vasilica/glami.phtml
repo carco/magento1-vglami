@@ -1,0 +1,41 @@
+<?php
+$helper = Mage::helper("vasilica_glami");
+if (!$helper->isEnabled()) {
+    return;
+}
+$apiKey = $helper->getApiKey();
+$cartItems = null;
+$orderItems = null;
+
+if ($helper->isAddToCartEnabled()) {
+    $session = Mage::getSingleton('vasilica_glami/session');
+    $cartItems = $session->getAddToCart();
+}
+
+if ($helper->isPurchaseEnabled()) {
+    $curPage = Mage::app()->getFrontController()->getAction()->getFullActionName();
+    if ('checkout_onepage_success' == $curPage) {
+        $order_id = (int)Mage::getSingleton('checkout/session')->getLastOrderId();
+        if ($order_id) {
+            $orderItems = $helper->getOrderItems($order_id);
+        }
+    }
+}
+?>
+
+<!-- Glami piXel Code -->
+<script>
+    (function(f, a, s, h, i, o, n) {f['GlamiTrackerObject'] = i;
+        f[i]=f[i]||function(){(f[i].q=f[i].q||[]).push(arguments)};o=a.createElement(s),
+            n=a.getElementsByTagName(s)[0];o.async=1;o.src=h;n.parentNode.insertBefore(o,n)
+    })(window, document, 'script', '//www.glami.ro/js/compiled/pt.js', 'glami');
+    glami('create', '<?php echo $apiKey; ?>', 'ro');
+    glami('track', 'PageView');
+<?php if($cartItems): ?>
+    glami('track', 'AddToCart', <?php echo json_encode($cartItems);?>);
+<?php endif; ?>
+<?php if($orderItems): ?>
+    glami('track', 'Purchase', <?php echo json_encode($orderItems);?>);
+<?php endif; ?>
+</script>
+<!-- End Glami piXel Code -->

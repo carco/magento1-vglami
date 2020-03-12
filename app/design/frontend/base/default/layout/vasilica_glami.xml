@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <block type="core/template" template="vasilica/glami.phtml" name="vasilica_glami" />
+        </reference>
+    </default>
+    <checkout_onepage_success translate="label">
+        <reference name="after_body_start">
+            <block type="core/template" template="vasilica/glami/purchase.phtml" />
+        </reference>
+    </checkout_onepage_success>
+</layout>
