@@ -4,6 +4,7 @@ if (!$helper->isEnabled()) {
     return;
 }
 $apiKey = $helper->getApiKey();
+$pageView = $helper->isPageViewEnabled();
 $cartItems = null;
 $orderItems = null;
 
@@ -30,7 +31,9 @@ if ($helper->isPurchaseEnabled()) {
             n=a.getElementsByTagName(s)[0];o.async=1;o.src=h;n.parentNode.insertBefore(o,n)
     })(window, document, 'script', '//www.glami.ro/js/compiled/pt.js', 'glami');
     glami('create', '<?php echo $apiKey; ?>', 'ro');
+<?php if($pageView): ?>
     glami('track', 'PageView');
+<?php endif; ?>
 <?php if($cartItems): ?>
     glami('track', 'AddToCart', <?php echo json_encode($cartItems);?>);
 <?php endif; ?>

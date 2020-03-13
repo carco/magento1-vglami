@@ -1,31 +1,45 @@
 <?php
 
 /**
+ * Glami PiXel
+ *
+ * @author Emil Sirbu <emil.sirbu@gmail.com>
+ *
+ * Based on Cadence Facebook Pixel
  * @author Alan Barber <alan@cadence-labs.com>
+ *
  */
 class Vasilica_Glami_Helper_Data extends Mage_Core_Helper_Abstract
 {
     public function isEnabled()
     {
-        return Mage::getStoreConfig("vasilica_glami/page_view/enabled");
+        return Mage::getStoreConfig("vasilica_glami/settings/enabled");
     }
     public function getApiKey()
     {
-        return Mage::getStoreConfig("vasilica_glami/page_view/api_key");
+        return Mage::getStoreConfig("vasilica_glami/settings/api_key");
     }
-
+    public function useSku()
+    {
+        return Mage::getStoreConfigFlag("vasilica_glami/settings/use_sku");
+    }
+    public function isPageViewEnabled()
+    {
+        return $this->isEnabled() &&  Mage::getStoreConfig("vasilica_glami/settings/page_view");
+    }
     public function isAddToCartEnabled()
     {
-        return $this->isEnabled() &&  Mage::getStoreConfig("vasilica_glami/add_to_cart/enabled");
+        return $this->isEnabled() &&  Mage::getStoreConfig("vasilica_glami/settings/add_to_cart");
     }
 
     public function isPurchaseEnabled()
     {
-        return $this->isEnabled() && Mage::getStoreConfig('vasilica_glami/purchase/enabled');
+        return $this->isEnabled() && Mage::getStoreConfig('vasilica_glami/settings/purchase');
     }
     
     public function getOrderItems($order)
     {
+        $useSku = $this->useSku();
         $data = null;
     
         if (is_numeric($order)) {
@@ -50,13 +64,40 @@ class Vasilica_Glami_Helper_Data extends Mage_Core_Helper_Abstract
                 */
                 if ($item->getHasChildren()) {
                     foreach ($item->getChildrenItems() as $child) {
-                        $data['item_ids'][] = $child->getProductId();
+                        $data['item_ids'][] = $this->useSku() ? $child->getSku() : $child->getProductId();
                         $data['product_names'][] = $child->getName();
                     }
                 } else {
-                    $data['item_ids'][] = $item->getProductId();
+                    $data['item_ids'][] = $this->useSku() ? $item->getSku() : $item->getProductId();
                     $data['product_names'][] = $item->getName();
                 }
+            }
+        }
+        return $data;
+    }
+    
+    public function getCartItems($items) {
+        
+        $data = null;
+        
+        if ($items) {
+
+            $data = [
+                'item_ids' => [],
+                'product_names' => [],
+                'value' => 0.00,
+                'currency' => Mage::app()->getStore()->getCurrentCurrencyCode()
+
+            ];
+
+            /** @var Mage_Sales_Model_Quote_Item $item */
+            foreach ($items as $item) {
+                if ($item->getParentItem()) {
+                    continue;
+                }
+                $data['item_ids'][] = $this->useSku() ? $item->getSku() : $item->getProductId();
+                $data['product_names'][] = $item->getName();
+                $data['value'] += $item->getProduct()->getFinalPrice() * $item->getProduct()->getQty();
             }
         }
         return $data;

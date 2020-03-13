@@ -25,28 +25,30 @@ Class Vasilica_Glami_Model_Observer
             Mage::dispatchEvent('sales_quote_product_add_after', array('items' => $items));
         */
         
+        
         /** @var array $items */
         $items = $obs->getItems();
-
-        $data = array_replace(array(
-            'item_ids' => [],
-            'product_names' => [], 
-            'value' => 0.00
-        ), $this->getSession()->getAddToCart() ?: array());
-
-        /** @var Mage_Sales_Model_Quote_Item $item */
-        foreach ($items as $item) {
-            if ($item->getParentItem()) {
-                continue;
-            }
-            $data['item_ids'][] = $item->getSku();
-            $data['product_names'][] = $item->getName();
-            $data['value'] += $item->getProduct()->getFinalPrice() * $item->getProduct()->getQty();
+        if(!$items) {
+            return $this;
         }
+        
+        $data = null;
+        $newData = $this->helper()->getCartItems($items);
+        if ($newData) {
+            $data = array_replace(array(
+                'item_ids' => [],
+                'product_names' => [],
+                'value' => 0.00
+            ), $this->getSession()->getAddToCart() ?: array());
+            
+            $data['item_ids'] = array_merge($data['item_ids'], $newData['item_ids']);
+            $data['product_names'] = array_merge($data['product_names'], $newData['product_names']);
+            $data['value'] = $data['value'] + $newData['value'];
+            $data['currency'] = $newData['currency'];
+        }
+        
 
-        $data['currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
-
-        if ($data['item_ids']) {
+        if (!empty($data['item_ids'])) {
             $this->getSession()->setAddToCart($data);
         } else {
             $this->getSession()->unsetAddToCart();

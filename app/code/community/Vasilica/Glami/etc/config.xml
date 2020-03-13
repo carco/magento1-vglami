@@ -55,16 +55,14 @@
     </frontend>
     <default>
         <vasilica_glami>
-            <page_view>
+            <settings>
                 <enabled>0</enabled>
                 <api_key><![CDATA[]]></api_key>
-            </page_view>
-            <add_to_cart>
-                <enabled>0</enabled>
-            </add_to_cart>
-            <purchase>
-                <enabled>0</enabled>
-            </purchase>            
+                <page_view>1</page_view>
+                <add_to_cart>1</add_to_cart>
+                <purchase>1</purchase>
+                <use_sku>0</use_sku>
+            </settings>
         </vasilica_glami>
     </default>
 </config>
