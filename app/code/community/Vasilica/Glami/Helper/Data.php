@@ -23,6 +23,10 @@ class Vasilica_Glami_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfigFlag("vasilica_glami/settings/use_sku");
     }
+    public function useIncrementId()
+    {
+        return Mage::getStoreConfigFlag("vasilica_glami/settings/use_increment_id");
+    }
     public function isPageViewEnabled()
     {
         return $this->isEnabled() &&  Mage::getStoreConfig("vasilica_glami/settings/page_view");
@@ -36,17 +40,17 @@ class Vasilica_Glami_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return $this->isEnabled() && Mage::getStoreConfig('vasilica_glami/settings/purchase');
     }
-    
+
     public function getOrderItems($order)
     {
         $useSku = $this->useSku();
         $data = null;
-    
+
         if (is_numeric($order)) {
             /** @var Mage_Sales_Model_Order $order */
             $order = Mage::getModel('sales/order')->load($order);
         }
-        
+
         if ($order && $order instanceof Mage_Sales_Model_Order && $order->getId()) {
 
             $data = [
@@ -54,7 +58,7 @@ class Vasilica_Glami_Helper_Data extends Mage_Core_Helper_Abstract
                 'product_names' => [],
                 'value' => round($order->getGrandTotal(), 2),
                 'currency' => $order->getOrderCurrencyCode(),
-                'transaction_id' => $order->getId()
+                'transaction_id' => $this->useIncrementId() ? $order->getIncrementId() : $order->getId()
             ];
 
             foreach ($order->getAllVisibleItems() as $item) {
@@ -75,11 +79,11 @@ class Vasilica_Glami_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $data;
     }
-    
+
     public function getCartItems($items) {
-        
+
         $data = null;
-        
+
         if ($items) {
 
             $data = [
@@ -97,7 +101,7 @@ class Vasilica_Glami_Helper_Data extends Mage_Core_Helper_Abstract
                 }
                 $data['item_ids'][] = $this->useSku() ? $item->getSku() : $item->getProductId();
                 $data['product_names'][] = $item->getName();
-                $data['value'] += $item->getProduct()->getFinalPrice() * $item->getProduct()->getQty();
+                $data['value'] += $item->getProduct()->getFinalPrice($item->getQty()) * $item->getQty();
             }
         }
         return $data;

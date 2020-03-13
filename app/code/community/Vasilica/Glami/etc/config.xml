@@ -62,6 +62,7 @@
                 <add_to_cart>1</add_to_cart>
                 <purchase>1</purchase>
                 <use_sku>0</use_sku>
+                <use_increment_id>1</use_increment_id>
             </settings>
         </vasilica_glami>
     </default>

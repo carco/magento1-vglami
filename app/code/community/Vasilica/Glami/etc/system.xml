@@ -80,8 +80,19 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>If YES, product SKU will be use as ITEM_ID on AddToCart/Purchase items</comment>
-                            <depends><enabled>1</enabled></depends>
+                            <depends><enabled>1</enabled><add_to_cart>1</add_to_cart></depends>
                         </use_sku>
+                        <use_increment_id translate="label" module="vasilica_glami">
+                            <label>Use Order Increment ID</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>If YES, order Increment ID will be use as Transaction_ID on Purchase (else, order ID will be used)</comment>
+                            <depends><enabled>1</enabled><purchase>1</purchase></depends>
+                        </use_increment_id>                        
                     </fields>
                 </settings>
             </groups>
